@@ -1,0 +1,29 @@
+{
+  "name": "project-h",
+  "version": "1.0.0",
+  "description": "Project-H - Black Minimalist AI Video & Motion Director Platform",
+  "main": "app.js",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "start": "vite"
+  },
+  "keywords": [
+    "ai",
+    "video-generator",
+    "higgsfield",
+    "cinema-studio",
+    "camera-control"
+  ],
+  "author": "Antigravity",
+  "license": "MIT",
+  "dependencies": {
+    "@vitejs/plugin-react": "^6.0.5",
+    "lucide-react": "^1.31.0",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
+    "react-router-dom": "^7.18.2",
+    "vite": "^8.2.1"
+  }
+}
