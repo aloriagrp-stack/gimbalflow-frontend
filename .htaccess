@@ -3,3 +3,7 @@ RewriteCond %{REQUEST_URI} !^/dist/
 RewriteCond %{REQUEST_URI} !^/api/
 RewriteRule ^(.*)$ /dist/$1 [L]
 FallbackResource /dist/index.html
+
+# Reverse proxy: /api -> Node.js backend (127.0.0.1:5000)
+RewriteCond %{REQUEST_URI} ^/api/
+RewriteRule ^api/(.*)$ http://127.0.0.1:5000/api/$1 [P,L]
