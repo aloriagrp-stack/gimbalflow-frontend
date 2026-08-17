@@ -28,7 +28,7 @@ jobs:
         run: npm run build
 
       - name: 📤 Upload Build Files to cPanel via FTP
-        uses: SamKirland/FTP-Deploy-Action@v4.3.5
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
@@ -39,7 +39,7 @@ jobs:
           state-name: .ftp-deploy-sync-state.json
 
       - name: 📄 Upload .htaccess to cPanel frontend root
-        uses: SamKirland/FTP-Deploy-Action@v4.3.5
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
