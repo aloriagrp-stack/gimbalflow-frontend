@@ -240,7 +240,7 @@ export default function App() {
     );
   }
 
-  if (!user && !isAdminPage) {
+  if (!user && location.pathname === '/login') {
     return <LoginPage />;
   }
 
@@ -383,6 +383,9 @@ export default function App() {
               <Route path="/shortcuts" element={<ShortcutsPage showToast={showToast} />} />
               <Route path="/help" element={<HelpPage showToast={showToast} />} />
             </Route>
+
+            {/* LOGIN ROUTE */}
+            <Route path="/login" element={user ? <Navigate to="/" replace /> : <LoginPage />} />
 
             {/* ADMIN PANEL (RESTRICTED) */}
             <Route path="/.shriyanshaloria" element={<AdminPanelPage showToast={showToast} />} />
