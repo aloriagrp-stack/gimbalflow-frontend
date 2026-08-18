@@ -36,7 +36,7 @@ const CACHE_KEYS = { hero: 'gf_hero_cache_v1', gallery: 'gf_gallery_cache_v1' };
 function loadCache(key) {
   try {
     const v = JSON.parse(localStorage.getItem(key));
-    return Array.isArray(v) && v.length ? v : null;
+    return Array.isArray(v) ? v : null;
   } catch { return null; }
 }
 
@@ -79,7 +79,7 @@ export default function ExplorePage({ showToast }) {
     fetch('/api/hero')
       .then((r) => (r.ok ? r.json() : Promise.reject(new Error('hero fetch failed'))))
       .then((cards) => {
-        if (!cancelled && Array.isArray(cards) && cards.length) {
+        if (!cancelled && Array.isArray(cards)) {
           saveCache(CACHE_KEYS.hero, cards);
           setHeroCards(cards.map((c) => {
             const link = VALID_LINKS.includes(c.link) ? c.link : null;
@@ -96,7 +96,7 @@ export default function ExplorePage({ showToast }) {
     fetch('/api/gallery')
       .then((r) => (r.ok ? r.json() : Promise.reject(new Error('gallery fetch failed'))))
       .then((items) => {
-        if (!cancelled && Array.isArray(items) && items.length) {
+        if (!cancelled && Array.isArray(items)) {
           saveCache(CACHE_KEYS.gallery, items);
           setGallery(items);
         }
