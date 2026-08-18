@@ -75,12 +75,19 @@ export default function ProfileDropdown({ isOpen, onClose, onOpenSignOut, user, 
 
       <div className="dropdown-divider"></div>
 
-      {/* SECTION 3: SIGN OUT */}
+      {/* SECTION 3: SIGN OUT / SIGN IN */}
       <div className="dropdown-section">
-        <button className="dropdown-item danger" onClick={() => { onClose(); onOpenSignOut(); }}>
-          <span className="icon"><LogOut size={15} /></span>
-          <span>Sign Out</span>
-        </button>
+        {user ? (
+          <button className="dropdown-item danger" onClick={() => { onClose(); onOpenSignOut(); }}>
+            <span className="icon"><LogOut size={15} /></span>
+            <span>Sign Out</span>
+          </button>
+        ) : (
+          <Link to="/login" className="dropdown-item" onClick={onClose} style={{ color: '#6366f1', fontWeight: 600 }}>
+            <span className="icon"><LogOut size={15} /></span>
+            <span>Sign In / Register</span>
+          </Link>
+        )}
       </div>
     </div>
   );
