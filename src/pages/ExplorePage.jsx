@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { Film } from 'lucide-react';
 
 const FALLBACK_CARDS = [
+  { id: 'hero-1786885787737-58kcv', media: 'video', src: '/uploads/hero/1786888290031-032f2d3600ce.mp4', poster: '', title: 'Anything. Anywhere.', desc: 'Create it with GimbalFlow.', link: '/cinema' },
+  { id: 'hero-1786891948049-rhrkw', media: 'video', src: '/uploads/hero/1786891948025-0f8e6e64159e.mp4', poster: '', title: 'Desert Rush', desc: 'High-speed beach buggy racing with cinematic action, intense overtakes, flying sand, and dynamic aerial shots.', link: '/cinema' },
   { id: 'hero-1', media: 'video', src: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4', poster: 'https://image.pollinations.ai/prompt/cinematic%20portrait%20of%20a%20woman%20neon%20cyan%20rim%20light%20dark%20studio?width=1000&height=562&seed=501&model=flux&nologo=true', title: 'CINEMA STUDIO 4 IS HERE', desc: 'More control. Longer scenes. Sharper quality.', link: '/cinema' },
   { id: 'hero-2', media: 'img', src: 'https://image.pollinations.ai/prompt/silhouette%20person%20neon%20fog%20cinematic%20moody?width=1000&height=562&seed=506&model=flux&nologo=true', title: 'GIMBALFLOW PLUGIN IN CHATGPT', desc: 'All the top models in one place: Seedance 2.5, Seedance 2.0...', link: '/image' },
   { id: 'hero-3', media: 'img', src: 'https://image.pollinations.ai/prompt/neon%20city%20skyline%20blade%20runner%20fog%20cinematic?width=1000&height=562&seed=503&model=flux&nologo=true', title: 'GIMBALFLOW LAYERS', desc: 'Image editor with real-time AI layer decomposition', link: '/image' },
@@ -13,6 +15,9 @@ const FALLBACK_CARDS = [
 const VALID_LINKS = ['/cinema', '/image', '/explore', '/profile'];
 
 const FALLBACK_GALLERY = [
+  { id: 'gal-1786887760137-8txgg', media: 'video', ratio: 'tall', src: '/uploads/hero/1786889088472-11777dc6b623.mp4', poster: '' },
+  { id: 'gal-1786907155186-yil4q', media: 'img', ratio: 'tall', src: '/uploads/hero/1786907155182-25d24e25c720.png', poster: '' },
+  { id: 'gal-1786910433047-psugi', media: 'img', ratio: 'tall', src: '/uploads/hero/1786910433044-070aef4532be.jpg', poster: '' },
   { id: 'gal-1', media: 'video', ratio: 'tall', src: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4', poster: 'https://image.pollinations.ai/prompt/milky%20way%20over%20mountain%20peaks%20astrophotography?width=800&height=1200&seed=504&model=flux&nologo=true' },
   { id: 'gal-2', media: 'img', ratio: 'tall', src: 'https://image.pollinations.ai/prompt/silhouette%20person%20neon%20fog%20cinematic%20moody?width=800&height=1200&seed=506&model=flux&nologo=true' },
   { id: 'gal-3', media: 'img', ratio: 'tall', src: 'https://image.pollinations.ai/prompt/cinematic%20portrait%20of%20a%20woman%20neon%20cyan%20rim%20light%20dark%20studio?width=800&height=1200&seed=501&model=flux&nologo=true' },
