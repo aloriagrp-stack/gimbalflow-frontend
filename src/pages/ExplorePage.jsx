@@ -130,12 +130,12 @@ export default function ExplorePage({ showToast }) {
         {card.media === 'video' ? (
           <video
             ref={(el) => registerVideo(el, `hero-vid-${index}`)}
-            src={card.src}
-            poster={card.poster}
+            src={card.src || card.srcData}
+            poster={card.poster || card.posterData}
             muted loop playsInline preload="metadata"
           />
         ) : (
-          <img src={card.src} alt={card.title} loading="lazy" decoding="async" />
+          <img src={card.src || card.srcData} alt={card.title} loading="lazy" decoding="async" />
         )}
         <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, transparent 40%, rgba(2,4,8,0.65) 100%)' }}></div>
       </div>
@@ -211,12 +211,12 @@ export default function ExplorePage({ showToast }) {
             {item.media === 'video' ? (
               <video
                 ref={(el) => registerVideo(el, `gal-vid-${item.id}`)}
-                src={item.src}
-                poster={item.poster}
+                src={item.src || item.srcData}
+                poster={item.poster || item.posterData}
                 muted loop playsInline preload="metadata"
               />
             ) : (
-              <img src={item.src} alt={item.title || 'gallery item'} loading="lazy" decoding="async" />
+              <img src={item.src || item.srcData} alt={item.title || 'gallery item'} loading="lazy" decoding="async" />
             )}
             {item.media === 'video' && (
               <span className="gallery-play-hint"><Film size={16} /></span>

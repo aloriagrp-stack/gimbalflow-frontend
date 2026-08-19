@@ -672,9 +672,9 @@ export default function AdminPanelPage({ showToast }) {
                           )
                         ) : editingCardSrc && !form.srcData ? (
                           editingCardSrc.media === 'video' ? (
-                            <video src={editingCardSrc.src} poster={editingCardSrc.poster} muted loop playsInline className="admin-upload-preview" />
+                            <video src={editingCardSrc.srcData || editingCardSrc.src} poster={editingCardSrc.posterData || editingCardSrc.poster} muted loop playsInline className="admin-upload-preview" />
                           ) : (
-                            <img src={editingCardSrc.src} alt="preview" className="admin-upload-preview" />
+                            <img src={editingCardSrc.srcData || editingCardSrc.src} alt="preview" className="admin-upload-preview" />
                           )
                         ) : (
                           <div className="admin-upload-placeholder">
@@ -766,11 +766,11 @@ export default function AdminPanelPage({ showToast }) {
                     <div key={card.id} className="admin-hero-card">
                       <div className="admin-hero-thumb">
                         {card.media === 'video' ? (
-                          <video src={card.src} poster={card.poster} muted loop playsInline preload="metadata"
+                          <video src={card.srcData || card.src} poster={card.posterData || card.poster} muted loop playsInline preload="metadata"
                             onMouseEnter={(e) => e.currentTarget.play().catch(() => {})}
                             onMouseLeave={(e) => e.currentTarget.pause()} />
                         ) : (
-                          <img src={card.src} alt={card.title} loading="lazy" decoding="async" />
+                          <img src={card.srcData || card.src} alt={card.title} loading="lazy" decoding="async" />
                         )}
                         <span className={`admin-hero-badge ${card.media === 'video' ? 'video' : 'img'}`}>
                           {card.media === 'video' ? <Film size={10} /> : <ImageIcon size={10} />}
@@ -951,11 +951,11 @@ export default function AdminPanelPage({ showToast }) {
                     <div key={item.id} className="admin-hero-card">
                       <div className="admin-hero-thumb">
                         {item.media === 'video' ? (
-                          <video src={item.src} poster={item.poster} muted loop playsInline preload="metadata"
+                          <video src={item.srcData || item.src} poster={item.posterData || item.poster} muted loop playsInline preload="metadata"
                             onMouseEnter={(e) => e.currentTarget.play().catch(() => {})}
                             onMouseLeave={(e) => e.currentTarget.pause()} />
                         ) : (
-                          <img src={item.src} alt="gallery item" loading="lazy" decoding="async" />
+                          <img src={item.srcData || item.src} alt="gallery item" loading="lazy" decoding="async" />
                         )}
                         <span className={`admin-hero-badge ${item.media === 'video' ? 'video' : 'img'}`}>
                           {item.media === 'video' ? <Film size={10} /> : <ImageIcon size={10} />}
