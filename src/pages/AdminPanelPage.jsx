@@ -265,7 +265,7 @@ export default function AdminPanelPage({ showToast }) {
     try { localStorage.setItem('gf_hero_cache_v1', JSON.stringify(cards)); } catch {}
     try {
       const payload = cards.map(({ id, media, title, desc, link, src, poster, srcData, posterData }) => ({
-        id, media, title, desc, link: link || null, src: src || null, poster: poster || null, srcData: srcData || undefined, posterData: posterData || undefined
+        id, media, title, desc, link: link || null, src: src || srcData || null, poster: poster || posterData || null, srcData: srcData || undefined, posterData: posterData || undefined
       }));
       const res = await fetch('/api/admin/hero', {
         method: 'POST',
@@ -353,7 +353,7 @@ export default function AdminPanelPage({ showToast }) {
     try { localStorage.setItem('gf_gallery_cache_v1', JSON.stringify(gallery)); } catch {}
     try {
       const payload = gallery.map(({ id, media, ratio, src, poster, srcData, posterData }) => ({
-        id, media, ratio, src: src || null, poster: poster || null, srcData: srcData || undefined, posterData: posterData || undefined
+        id, media, ratio, src: src || srcData || null, poster: poster || posterData || null, srcData: srcData || undefined, posterData: posterData || undefined
       }));
       const res = await fetch('/api/admin/gallery', {
         method: 'POST',
