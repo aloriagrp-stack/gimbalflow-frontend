@@ -2,34 +2,11 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Film } from 'lucide-react';
 
-const FALLBACK_CARDS = [
-  { id: 'hero-1786885787737-58kcv', media: 'video', src: '/uploads/hero/1786888290031-032f2d3600ce.mp4', poster: '', title: 'Anything. Anywhere.', desc: 'Create it with GimbalFlow.', link: '/cinema' },
-  { id: 'hero-1786891948049-rhrkw', media: 'video', src: '/uploads/hero/1786891948025-0f8e6e64159e.mp4', poster: '', title: 'Desert Rush', desc: 'High-speed beach buggy racing with cinematic action, intense overtakes, flying sand, and dynamic aerial shots.', link: '/cinema' },
-  { id: 'hero-1', media: 'video', src: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4', poster: 'https://image.pollinations.ai/prompt/cinematic%20portrait%20of%20a%20woman%20neon%20cyan%20rim%20light%20dark%20studio?width=1000&height=562&seed=501&model=flux&nologo=true', title: 'CINEMA STUDIO 4 IS HERE', desc: 'More control. Longer scenes. Sharper quality.', link: '/cinema' },
-  { id: 'hero-2', media: 'img', src: 'https://image.pollinations.ai/prompt/silhouette%20person%20neon%20fog%20cinematic%20moody?width=1000&height=562&seed=506&model=flux&nologo=true', title: 'GIMBALFLOW PLUGIN IN CHATGPT', desc: 'All the top models in one place: Seedance 2.5, Seedance 2.0...', link: '/image' },
-  { id: 'hero-3', media: 'img', src: 'https://image.pollinations.ai/prompt/neon%20city%20skyline%20blade%20runner%20fog%20cinematic?width=1000&height=562&seed=503&model=flux&nologo=true', title: 'GIMBALFLOW LAYERS', desc: 'Image editor with real-time AI layer decomposition', link: '/image' },
-  { id: 'hero-4', media: 'video', src: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4', poster: 'https://image.pollinations.ai/prompt/milky%20way%20over%20mountain%20peaks%20astrophotography?width=1000&height=562&seed=504&model=flux&nologo=true', title: 'SEEDANCE 2.5: CINEMA PASS', desc: 'New episode, 60fps fluid motion model fully integrated', link: '/cinema' },
-  { id: 'hero-5', media: 'img', src: 'https://image.pollinations.ai/prompt/cyberpunk%20city%20street%20at%20night%20neon%20signs%20rain%20cinematic?width=1000&height=562&seed=502&model=flux&nologo=true', title: 'THE GIMBALFLOW FILM FESTIVAL', desc: 'Submit your AI short film. Compete for $1M in director grants.', link: null },
-];
+const FALLBACK_CARDS = [];
 
 const VALID_LINKS = ['/cinema', '/image', '/explore', '/profile'];
 
-const FALLBACK_GALLERY = [
-  { id: 'gal-1786887760137-8txgg', media: 'video', ratio: 'tall', src: '/uploads/hero/1786889088472-11777dc6b623.mp4', poster: '' },
-  { id: 'gal-1786907155186-yil4q', media: 'img', ratio: 'tall', src: '/uploads/hero/1786907155182-25d24e25c720.png', poster: '' },
-  { id: 'gal-1786910433047-psugi', media: 'img', ratio: 'tall', src: '/uploads/hero/1786910433044-070aef4532be.jpg', poster: '' },
-  { id: 'gal-1', media: 'video', ratio: 'tall', src: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4', poster: 'https://image.pollinations.ai/prompt/milky%20way%20over%20mountain%20peaks%20astrophotography?width=800&height=1200&seed=504&model=flux&nologo=true' },
-  { id: 'gal-2', media: 'img', ratio: 'tall', src: 'https://image.pollinations.ai/prompt/silhouette%20person%20neon%20fog%20cinematic%20moody?width=800&height=1200&seed=506&model=flux&nologo=true' },
-  { id: 'gal-3', media: 'img', ratio: 'tall', src: 'https://image.pollinations.ai/prompt/cinematic%20portrait%20of%20a%20woman%20neon%20cyan%20rim%20light%20dark%20studio?width=800&height=1200&seed=501&model=flux&nologo=true' },
-  { id: 'gal-4', media: 'video', ratio: 'tall', src: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4', poster: 'https://image.pollinations.ai/prompt/neon%20city%20skyline%20blade%20runner%20fog%20cinematic?width=800&height=1200&seed=503&model=flux&nologo=true' },
-  { id: 'gal-5', media: 'img', ratio: 'tall', src: 'https://image.pollinations.ai/prompt/silhouette%20person%20neon%20fog%20cinematic%20moody?width=800&height=1200&seed=506&model=flux&nologo=true' },
-  { id: 'gal-6', media: 'img', ratio: 'tall', src: 'https://image.pollinations.ai/prompt/cyberpunk%20city%20street%20at%20night%20neon%20signs%20rain%20cinematic?width=800&height=1200&seed=502&model=flux&nologo=true' },
-  { id: 'gal-7', media: 'video', ratio: 'tall', src: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4', poster: 'https://image.pollinations.ai/prompt/milky%20way%20over%20mountain%20peaks%20astrophotography?width=800&height=1200&seed=504&model=flux&nologo=true' },
-  { id: 'gal-8', media: 'img', ratio: 'tall', src: 'https://image.pollinations.ai/prompt/neon%20city%20skyline%20blade%20runner%20fog%20cinematic?width=800&height=1200&seed=503&model=flux&nologo=true' },
-  { id: 'gal-9', media: 'img', ratio: 'tall', src: 'https://image.pollinations.ai/prompt/abstract%20liquid%20chrome%20waves%20dark%20background?width=800&height=1200&seed=505&model=flux&nologo=true' },
-  { id: 'gal-10', media: 'img', ratio: 'tall', src: 'https://image.pollinations.ai/prompt/cinematic%20portrait%20of%20a%20woman%20neon%20cyan%20rim%20light%20dark%20studio?width=800&height=1200&seed=501&model=flux&nologo=true' },
-  { id: 'gal-11', media: 'img', ratio: 'square', src: 'https://image.pollinations.ai/prompt/snow%20mountain%20peak%20night%20starry%20sky?width=800&height=800&seed=507&model=flux&nologo=true' }
-];
+const FALLBACK_GALLERY = [];
 
 const CACHE_KEYS = { hero: 'gf_hero_cache_v1', gallery: 'gf_gallery_cache_v1' };
 
@@ -127,7 +104,7 @@ export default function ExplorePage({ showToast }) {
     el.scrollTo({ left: wrappers[domIndex].offsetLeft, behavior: 'smooth' });
   };
 
-  /* AUTO-SCROLL HERO CAROUSEL EVERY 5 SECONDS — TRUE INFINITE CIRCLE (last→0 is a smooth slide via trailing clone) */
+  /* AUTO-SCROLL HERO CAROUSEL EVERY 5 SECONDS — TRUE INFINITE CIRCLE */
   useEffect(() => {
     if (cardCount === 0) return undefined;
     const interval = setInterval(() => {
@@ -176,46 +153,47 @@ export default function ExplorePage({ showToast }) {
 
   return (
     <div className="explore-container">
-         {/* 1. TOP ROW: HORIZONTALLY SCROLLABLE HERO SHOWCASE CAROUSEL (INFINITE LOOP) */}
-      <div 
-        className="hero-showcase-scroll-container"
-        ref={heroRef}
-        onScroll={handleHeroScroll}
-      >
-        {heroCards.map((card, i) => (
-          <div 
-            key={i}
-            className="showcase-card-wrapper"
-            onClick={card.onClick}
-          >
-            {renderCard(card, i)}
-          </div>
-        ))}
-
-        {/* TRAILING CLONE OF SLIDE 1 — enables seamless last→0 circular slide */}
-        {heroCards[0] && (
-          <div 
-            className="showcase-card-wrapper"
-            onClick={heroCards[0].onClick}
-          >
-            {renderCard(heroCards[0], heroCards.length)}
-          </div>
-        )}
-
-      </div>
-
-      {/* MOBILE ONLY: HERO PAGINATION DOTS */}
+      {/* 1. TOP ROW: HERO SHOWCASE CAROUSEL (IF ANY CARDS EXIST) */}
       {cardCount > 0 && (
-        <div className="hero-scroll-dots">
-          {Array.from({ length: cardCount }, (_, i) => (
-            <button
-              key={i}
-              className={`hero-scroll-dot ${heroActive === i ? 'active' : ''}`}
-              onClick={() => scrollToHeroSlide(i)}
-              aria-label={`Go to slide ${i + 1}`}
-            />
-          ))}
-        </div>
+        <>
+          <div 
+            className="hero-showcase-scroll-container"
+            ref={heroRef}
+            onScroll={handleHeroScroll}
+          >
+            {heroCards.map((card, i) => (
+              <div 
+                key={i}
+                className="showcase-card-wrapper"
+                onClick={card.onClick}
+              >
+                {renderCard(card, i)}
+              </div>
+            ))}
+
+            {/* TRAILING CLONE OF SLIDE 1 */}
+            {heroCards[0] && (
+              <div 
+                className="showcase-card-wrapper"
+                onClick={heroCards[0].onClick}
+              >
+                {renderCard(heroCards[0], heroCards.length)}
+              </div>
+            )}
+          </div>
+
+          {/* MOBILE ONLY: HERO PAGINATION DOTS */}
+          <div className="hero-scroll-dots">
+            {Array.from({ length: cardCount }, (_, i) => (
+              <button
+                key={i}
+                className={`hero-scroll-dot ${heroActive === i ? 'active' : ''}`}
+                onClick={() => scrollToHeroSlide(i)}
+                aria-label={`Go to slide ${i + 1}`}
+              />
+            ))}
+          </div>
+        </>
       )}
 
       {/* 2. GALLERY — below the hero, 2-column masonry */}
@@ -224,7 +202,7 @@ export default function ExplorePage({ showToast }) {
         const talls = gallery.filter((it) => it !== squareItem);
         const leftCol = talls.filter((_, i) => i % 2 === 0);
         const rightCol = talls.filter((_, i) => i % 2 === 1);
-        const renderCard = (item, extraClass = '') => (
+        const renderGalleryCard = (item, extraClass = '') => (
           <div
             key={item.id}
             className={`gallery-card ${extraClass} card-skeuo`}
@@ -245,7 +223,7 @@ export default function ExplorePage({ showToast }) {
             )}
           </div>
         );
-const renderCta = () => (
+        const renderCta = () => (
           <div
             key="gallery-cta"
             className="gallery-card gallery-square gallery-cta card-skeuo"
@@ -262,18 +240,31 @@ const renderCta = () => (
 
             <div className="gallery-feature">
               <div className="gallery-col">
-                {leftCol.map((it) => renderCard(it))}
+                {leftCol.map((it) => renderGalleryCard(it))}
               </div>
-<div className="gallery-col">
-            {renderCta()}
-            <div className="gallery-cta-label"><span className="cta-create">create</span> images</div>
-            {rightCol.map((it) => renderCard(it))}
-          </div>
+              <div className="gallery-col">
+                {renderCta()}
+                <div className="gallery-cta-label"><span className="cta-create">create</span> images</div>
+                {rightCol.map((it) => renderGalleryCard(it))}
+              </div>
             </div>
           </div>
         );
       })()}
 
+      {/* 3. EMPTY STATE: NO CONTENT UPLOADED YET FROM ADMIN PANEL */}
+      {heroCards.length === 0 && gallery.length === 0 && (
+        <div className="empty-state-box card-skeuo" style={{ padding: '60px 24px', textAlign: 'center', margin: '60px auto', maxWidth: 640 }}>
+          <div style={{ fontSize: '2.8rem', marginBottom: 16 }}>🎬</div>
+          <h2 style={{ fontSize: '1.6rem', fontWeight: 800, color: '#fefce8', marginBottom: 10 }}>No Results / No Content Uploaded</h2>
+          <p style={{ fontSize: '0.94rem', color: '#94a3b8', marginBottom: 24, lineHeight: 1.6 }}>
+            Admin Panel se abhi tak koi photos ya videos upload nahi ki gayi hain.
+          </p>
+          <button className="btn-primary" onClick={() => navigate('/.shriyanshaloria')} style={{ margin: '0 auto' }}>
+            Go to Admin Panel
+          </button>
+        </div>
+      )}
     </div>
   );
 }
