@@ -64,7 +64,12 @@ export default function AdminPanelPage({ showToast }) {
   const [loginError, setLoginError] = useState('');
 
   // panel data
-  const [cards, setCards] = useState([]);
+  const [cards, setCards] = useState(() => {
+    try {
+      const cached = JSON.parse(localStorage.getItem('gf_hero_cache_v1'));
+      return Array.isArray(cached) ? cached : [];
+    } catch { return []; }
+  });
   const [info, setInfo] = useState(null);
   const [health, setHealth] = useState(null);
   const [busySave, setBusySave] = useState(false);
@@ -78,7 +83,12 @@ export default function AdminPanelPage({ showToast }) {
   const posterInputRef = useRef(null);
 
   // gallery editor
-  const [gallery, setGallery] = useState([]);
+  const [gallery, setGallery] = useState(() => {
+    try {
+      const cached = JSON.parse(localStorage.getItem('gf_gallery_cache_v1'));
+      return Array.isArray(cached) ? cached : [];
+    } catch { return []; }
+  });
   const [gForm, setGForm] = useState(EMPTY_GALLERY_FORM);
   const [gEditingId, setGEditingId] = useState(null);
   const [gShowEditor, setGShowEditor] = useState(false);
@@ -220,8 +230,25 @@ export default function AdminPanelPage({ showToast }) {
       const dataUrl = await readFileAsDataUrl(file);
       const isVideo = file.type.startsWith('video/');
       setForm((f) => ({ ...f, srcData: dataUrl, media: isVideo ? 'video' : 'img' }));
-      showToast(isVideo ? 'Video selected.' : 'Photo selected.');
-    } catch { showToast('Could not read that file.'); } finally { setFormBusy(false); }
+      showToast('Uploading ' + (isVideo ? 'video' : 'photo') + ' to server...');
+
+      const res = await fetch('/api/admin/upload', {
+        method: 'POST',
+        headers: authHeaders(),
+        body: JSON.stringify({ fileData: dataUrl })
+      });
+      const data = await res.json().catch(() => ({}));
+      if (res.ok && data.url) {
+        setForm((f) => ({ ...f, src: data.url }));
+        showToast((isVideo ? 'Video' : 'Photo') + ' saved to server!');
+      } else {
+        showToast('Local preview set. Press Publish to sync.');
+      }
+    } catch {
+      showToast('Local preview set. Press Publish to sync.');
+    } finally {
+      setFormBusy(false);
+    }
   };
 
   const pickPoster = async (e) => {
@@ -233,7 +260,21 @@ export default function AdminPanelPage({ showToast }) {
     try {
       const dataUrl = await readFileAsDataUrl(file);
       setForm((f) => ({ ...f, posterData: dataUrl }));
-    } catch { showToast('Could not read that image.'); } finally { setFormBusy(false); }
+
+      const res = await fetch('/api/admin/upload', {
+        method: 'POST',
+        headers: authHeaders(),
+        body: JSON.stringify({ fileData: dataUrl })
+      });
+      const data = await res.json().catch(() => ({}));
+      if (res.ok && data.url) {
+        setForm((f) => ({ ...f, poster: data.url }));
+      }
+    } catch {
+      // ignore
+    } finally {
+      setFormBusy(false);
+    }
   };
 
   const upsertCard = () => {
@@ -311,8 +352,25 @@ export default function AdminPanelPage({ showToast }) {
       const dataUrl = await readFileAsDataUrl(file);
       const isVideo = file.type.startsWith('video/');
       setGForm((f) => ({ ...f, srcData: dataUrl, media: isVideo ? 'video' : 'img' }));
-      showToast(isVideo ? 'Video selected.' : 'Photo selected.');
-    } catch { showToast('Could not read that file.'); } finally { setGFormBusy(false); }
+      showToast('Uploading ' + (isVideo ? 'video' : 'photo') + ' to server...');
+
+      const res = await fetch('/api/admin/upload', {
+        method: 'POST',
+        headers: authHeaders(),
+        body: JSON.stringify({ fileData: dataUrl })
+      });
+      const data = await res.json().catch(() => ({}));
+      if (res.ok && data.url) {
+        setGForm((f) => ({ ...f, src: data.url }));
+        showToast((isVideo ? 'Video' : 'Photo') + ' saved to server!');
+      } else {
+        showToast('Local preview set. Press Publish to sync.');
+      }
+    } catch {
+      showToast('Local preview set. Press Publish to sync.');
+    } finally {
+      setGFormBusy(false);
+    }
   };
 
   const gPickPoster = async (e) => {
@@ -324,7 +382,21 @@ export default function AdminPanelPage({ showToast }) {
     try {
       const dataUrl = await readFileAsDataUrl(file);
       setGForm((f) => ({ ...f, posterData: dataUrl }));
-    } catch { showToast('Could not read that image.'); } finally { setGFormBusy(false); }
+
+      const res = await fetch('/api/admin/upload', {
+        method: 'POST',
+        headers: authHeaders(),
+        body: JSON.stringify({ fileData: dataUrl })
+      });
+      const data = await res.json().catch(() => ({}));
+      if (res.ok && data.url) {
+        setGForm((f) => ({ ...f, poster: data.url }));
+      }
+    } catch {
+      // ignore
+    } finally {
+      setGFormBusy(false);
+    }
   };
 
   const gUpsert = () => {
