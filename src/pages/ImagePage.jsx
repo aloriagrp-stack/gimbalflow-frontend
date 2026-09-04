@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Sparkles, Image as ImageIcon, ChevronDown, ChevronLeft, ArrowUp, Check, RefreshCw, FolderPlus, Layers, MoreVertical, Download, ChevronRight, Star, Plus, X, ZoomIn, ZoomOut } from 'lucide-react';
-import { enhancePromptApi } from '../services/apiService';
+import { enhancePromptApi, generateAiImageApi, fetchProvidersStatusApi } from '../services/apiService';
 
 // Smart progress estimate while a real image is being rendered server-side.
 // No real progress API exists — it climbs smoothly to 95% and fades out when the image loads.
@@ -82,7 +82,7 @@ export default function ImagePage({
 }) {
   const mode = 'image'; // image only
   const [prompt, setPrompt] = useState(preloadedSetup?.prompt || '');
-  const [model, setModel] = useState(preloadedSetup?.model || 'Higgsfield Cinema Pro');
+  const [model, setModel] = useState(preloadedSetup?.model || 'Google Imagen 3 (Ultra 8K)');
   const [aspectRatio, setAspectRatio] = useState(preloadedSetup?.aspectRatio || '16:9');
   const [numImages, setNumImages] = useState(2);
   const [referenceImg, setReferenceImg] = useState(null);
@@ -222,7 +222,7 @@ export default function ImagePage({
 
   // Model list based on mode
   const modelOptions = mode === 'image' 
-    ? ['Higgsfield Cinema Pro', 'Seedance v2', 'ActionDiff v3']
+    ? ['Google Imagen 3 (Ultra 8K)', 'OpenAI DALL-E 3 (Cinema HD)', 'Higgsfield Cinema Pro', 'Seedance v2', 'Flux Realism']
     : ['Seedance 2.5 Cinema', 'Higgsfield Motion Pro', 'Sora Cinema'];
 
   const creditCost = 10;
@@ -249,7 +249,7 @@ export default function ImagePage({
     setGenerating(true);
     setPrompt('');
 
-    // Autonomous Director-Grade Prompt Engineering
+    // 1. Autonomous Director-Grade Prompt Engineering
     let finalPrompt = rawPrompt;
     let appliedTags = [];
     let promptCategory = 'GENERAL';
@@ -265,10 +265,23 @@ export default function ImagePage({
       console.warn('AI Director Prompt Expansion fallback to raw prompt:', err);
     }
 
+    // 2. Dispatch real AI generation to backend
+    let realAiResult = null;
+    try {
+      realAiResult = await generateAiImageApi({
+        prompt: rawPrompt,
+        model,
+        aspectRatio,
+        numImages
+      });
+    } catch (err) {
+      console.warn('generateAiImageApi call failed:', err);
+    }
+
     const job = onGenerate(mode, {
       prompt: finalPrompt,
       originalPrompt: rawPrompt,
-      model,
+      model: realAiResult?.provider || model,
       aspectRatio,
       numImages,
       referenceImg
@@ -285,31 +298,45 @@ export default function ImagePage({
       hour: '2-digit', minute: '2-digit', hour12: true 
     });
     const baseSeed = Date.now() % 100000 + Math.floor(Math.random() * 1000);
-    const generatedItems = Array.from({ length: numImages }).map((_, idx) => ({
-      id: `${mode}-res-${Date.now()}-${idx}`,
-      url: buildPollinationsUrl(finalPrompt, aspectRatio, baseSeed + idx),
-      prompt: rawPrompt,
-      enhancedPrompt: finalPrompt,
-      category: promptCategory,
-      appliedTags,
-      model,
-      mode,
-      aspectRatio,
-      batchId,
-      generatedAt,
-      date: 'Just now'
-    }));
 
-    // Give the first image a moment to start loading, then show results
+    // If real AI returned a local or hosted media URL, use it!
+    const generatedItems = Array.from({ length: numImages }).map((_, idx) => {
+      let mediaUrl = '';
+      if (realAiResult?.url && idx === 0) {
+        // First image gets the real provider URL
+        mediaUrl = realAiResult.url.startsWith('/')
+          ? `${window.location.origin}${realAiResult.url}`
+          : realAiResult.url;
+      } else {
+        mediaUrl = buildPollinationsUrl(finalPrompt, aspectRatio, baseSeed + idx);
+      }
+
+      return {
+        id: `${mode}-res-${Date.now()}-${idx}`,
+        url: mediaUrl,
+        prompt: rawPrompt,
+        enhancedPrompt: finalPrompt,
+        category: promptCategory,
+        appliedTags,
+        model: realAiResult?.provider || model,
+        isRealAi: realAiResult?.is_real_ai || false,
+        mode,
+        aspectRatio,
+        batchId,
+        generatedAt,
+        date: 'Just now'
+      };
+    });
+
     setTimeout(() => {
       setGenerating(false);
       setResults(prev => [...generatedItems, ...prev]);
       if (showToast) {
-        const isUpgraded = finalPrompt !== rawPrompt;
-        showToast(isUpgraded 
-          ? `✨ Director-Engine upgraded! Generating ${numImages} image(s)...` 
-          : `Generating ${numImages} image(s) with ${model}...`
-        );
+        const providerName = realAiResult?.provider || model;
+        showToast(`✨ Generated with ${providerName}!`);
+        if (realAiResult?.notice) {
+          setTimeout(() => showToast(realAiResult.notice), 3500);
+        }
       }
     }, 400);
   };
@@ -600,11 +627,15 @@ const downloadAsPng = async (res, maxQuality, name) => {
                               <p className="card-prompt-text" style={{ margin: 0, flex: 1 }}>
                                 {res.prompt}
                               </p>
-                              {res.enhancedPrompt && res.enhancedPrompt !== res.prompt && (
+                              {res.isRealAi ? (
+                                <span className="ai-enhanced-pill" style={{ background: 'linear-gradient(135deg, rgba(56, 189, 248, 0.25) 0%, rgba(12, 247, 0, 0.25) 100%)', borderColor: '#38bdf8', color: '#38bdf8' }} title={res.model}>
+                                  ⚡ {res.model?.split('(')[0]?.trim() || 'AI Real'}
+                                </span>
+                              ) : res.enhancedPrompt && res.enhancedPrompt !== res.prompt ? (
                                 <span className="ai-enhanced-pill" title={res.enhancedPrompt}>
                                   ✨ AI Enhanced
                                 </span>
-                              )}
+                              ) : null}
                             </div>
                           </div>
 

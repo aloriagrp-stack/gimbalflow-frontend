@@ -173,6 +173,32 @@ export async function enhancePromptApi(prompt) {
   };
 }
 
+export async function fetchProvidersStatusApi() {
+  try {
+    const res = await fetch(`${API_BASE}/generate/providers-status`);
+    if (res.ok) return await res.json();
+  } catch (err) {
+    console.warn('API fetchProvidersStatus fallback:', err.message);
+  }
+  return { gemini_imagen: false, openai_dalle: false, active_models: ['Seedance v2', 'Flux Realism'] };
+}
+
+export async function generateAiImageApi(params) {
+  try {
+    const res = await fetch(`${API_BASE}/generate/ai-image`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(params)
+    });
+    if (res.ok) {
+      return await res.json();
+    }
+  } catch (err) {
+    console.warn('Backend generateAiImage failed, falling back:', err.message);
+  }
+  return null;
+}
+
 export async function createGenerationJobApi(jobParams) {
   try {
     const res = await fetch(`${API_BASE}/generate/job`, {
