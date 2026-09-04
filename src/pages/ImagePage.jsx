@@ -341,13 +341,51 @@ export default function ImagePage({
               batches.find(b => b.batchId === bid).items.push(res);
             });
 
-            // Aspect ratio → grid columns
-            const ratioCols = { '16:9': 'repeat(auto-fit, minmax(min(380px, 100%), 1fr))', '9:16': 'repeat(auto-fit, minmax(min(220px, 100%), 1fr))', '1:1': 'repeat(auto-fit, minmax(min(300px, 100%), 1fr))', '21:9': '1fr' };
-
             return batches.map((batch, bIdx) => {
               const batchRatio = batch.items[0]?.aspectRatio || '16:9';
-              const gridCols = ratioCols[batchRatio] || ratioCols['16:9'];
-              const timestamp = batch.items[0]?.generatedAt || '';
+              const itemCount = batch.items.length;
+
+              // Smart container styling: 1 image should be elegant & compact, not taking full 960px!
+              let containerStyle = { display: 'grid', gap: 14, width: '100%' };
+
+              if (itemCount === 1) {
+                const maxDim = {
+                  '1:1': '460px',
+                  '16:9': '580px',
+                  '9:16': '320px',
+                  '21:9': '660px'
+                }[batchRatio] || '460px';
+
+                containerStyle = {
+                  display: 'flex',
+                  justifyContent: 'center',
+                  width: '100%',
+                  maxWidth: maxDim,
+                  margin: '0 auto'
+                };
+              } else if (itemCount === 2) {
+                containerStyle = {
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
+                  gap: 14,
+                  width: '100%',
+                  maxWidth: '820px',
+                  margin: '0 auto'
+                };
+              } else {
+                const ratioCols = {
+                  '16:9': 'repeat(auto-fit, minmax(min(340px, 100%), 1fr))',
+                  '9:16': 'repeat(auto-fit, minmax(min(200px, 100%), 1fr))',
+                  '1:1': 'repeat(auto-fit, minmax(min(260px, 100%), 1fr))',
+                  '21:9': '1fr'
+                };
+                containerStyle = {
+                  display: 'grid',
+                  gridTemplateColumns: ratioCols[batchRatio] || ratioCols['16:9'],
+                  gap: 14,
+                  width: '100%'
+                };
+              }
 
               return (
                 <div key={batch.batchId} style={{ width: '100%' }}>
@@ -360,7 +398,7 @@ export default function ImagePage({
                   )}
 
                   {/* BATCH GRID */}
-                  <div className="generated-grid-container" style={{ display: 'grid', gridTemplateColumns: gridCols, gap: 12 }}>
+                  <div className="generated-grid-container" style={containerStyle}>
                     {batch.items.map(res => {
                       const isMenuOpen = activeCardMenu === res.id;
 const downloadAsPng = async (res, maxQuality, name) => {

@@ -34,6 +34,10 @@ export default function Sidebar({
       style={{
         width: isCollapsed ? 64 : 230,
         minWidth: isCollapsed ? 64 : 230,
+        height: '100%',
+        maxHeight: '100%',
+        overflowY: 'auto',
+        flexShrink: 0,
         background: 'linear-gradient(180deg, #090c14 0%, #04060a 100%)',
         borderRight: '1px solid rgba(255, 255, 255, 0.08)',
         display: 'flex',

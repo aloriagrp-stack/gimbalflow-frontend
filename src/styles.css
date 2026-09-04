@@ -78,7 +78,18 @@ body {
   min-height: 0;
   display: flex;
   width: 100%;
+  overflow: hidden;
+  position: relative;
+}
+
+.app-scroll-body > main {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
   overflow-y: auto;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
 /* TOP NAVIGATION HEADER */
