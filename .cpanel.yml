@@ -2,4 +2,5 @@
 deployment:
   tasks:
     - export DEPLOYPATH=/home/vgyuvmpi/gimbalflow.space/
-    - /bin/cp -R * $DEPLOYPATH
+    - /bin/cp -R dist/* $DEPLOYPATH
+    - /bin/cp .htaccess $DEPLOYPATH

@@ -135,7 +135,7 @@ export default function ImagePage({
 
   const openLightbox = (res) => {
     setZoom({ s: 1, tx: 0, ty: 0 });
-    setLightbox({ url: res.url });
+    setLightbox({ url: res.url, item: res });
   };
 
   const closeLightbox = () => setLightbox(null);
@@ -237,19 +237,37 @@ export default function ImagePage({
     return `https://image.pollinations.ai/prompt/${encodeURIComponent(p)}?width=${dims.w}&height=${dims.h}&seed=${seed}&model=flux&nologo=true`;
   };
 
-  const handleGenerate = (e) => {
+  const handleGenerate = async (e) => {
     e?.preventDefault();
     if (!prompt.trim()) {
       if (showToast) showToast('Please enter a prompt first.');
       return;
     }
 
+    const rawPrompt = prompt.trim();
     setIsLanded(true);
     setGenerating(true);
     setPrompt('');
 
+    // Autonomous Director-Grade Prompt Engineering
+    let finalPrompt = rawPrompt;
+    let appliedTags = [];
+    let promptCategory = 'GENERAL';
+
+    try {
+      const enhanced = await enhancePromptApi(rawPrompt);
+      if (enhanced && enhanced.enhanced_prompt) {
+        finalPrompt = enhanced.enhanced_prompt;
+        appliedTags = enhanced.applied_tags || [];
+        promptCategory = enhanced.category || 'GENERAL';
+      }
+    } catch (err) {
+      console.warn('AI Director Prompt Expansion fallback to raw prompt:', err);
+    }
+
     const job = onGenerate(mode, {
-      prompt,
+      prompt: finalPrompt,
+      originalPrompt: rawPrompt,
       model,
       aspectRatio,
       numImages,
@@ -269,8 +287,11 @@ export default function ImagePage({
     const baseSeed = Date.now() % 100000 + Math.floor(Math.random() * 1000);
     const generatedItems = Array.from({ length: numImages }).map((_, idx) => ({
       id: `${mode}-res-${Date.now()}-${idx}`,
-      url: buildPollinationsUrl(prompt, aspectRatio, baseSeed + idx),
-      prompt,
+      url: buildPollinationsUrl(finalPrompt, aspectRatio, baseSeed + idx),
+      prompt: rawPrompt,
+      enhancedPrompt: finalPrompt,
+      category: promptCategory,
+      appliedTags,
       model,
       mode,
       aspectRatio,
@@ -283,7 +304,13 @@ export default function ImagePage({
     setTimeout(() => {
       setGenerating(false);
       setResults(prev => [...generatedItems, ...prev]);
-      if (showToast) showToast(`Generating ${numImages} image(s) with ${model}...`);
+      if (showToast) {
+        const isUpgraded = finalPrompt !== rawPrompt;
+        showToast(isUpgraded 
+          ? `✨ Director-Engine upgraded! Generating ${numImages} image(s)...` 
+          : `Generating ${numImages} image(s) with ${model}...`
+        );
+      }
     }, 400);
   };
 
@@ -568,10 +595,17 @@ const downloadAsPng = async (res, maxQuality, name) => {
                           )}
 
                           {/* BOTTOM HOVER PROMPT OVERLAY (Left to Right, Ellipsis) */}
-                          <div className="card-hover-prompt-overlay" title={res.prompt}>
-                            <p className="card-prompt-text">
-                              {res.prompt}
-                            </p>
+                          <div className="card-hover-prompt-overlay" title={res.enhancedPrompt ? `Original: ${res.prompt}\n\n✨ Enhanced: ${res.enhancedPrompt}` : res.prompt}>
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 6, width: '100%' }}>
+                              <p className="card-prompt-text" style={{ margin: 0, flex: 1 }}>
+                                {res.prompt}
+                              </p>
+                              {res.enhancedPrompt && res.enhancedPrompt !== res.prompt && (
+                                <span className="ai-enhanced-pill" title={res.enhancedPrompt}>
+                                  ✨ AI Enhanced
+                                </span>
+                              )}
+                            </div>
                           </div>
 
                         </div>
@@ -780,6 +814,47 @@ const downloadAsPng = async (res, maxQuality, name) => {
               <ZoomIn size={18} />
             </button>
           </div>
+
+          {/* PROMPT DRAWER IN LIGHTBOX */}
+          {lightbox.item && (
+            <div className="lightbox-prompt-drawer" onClick={(e) => e.stopPropagation()}>
+              <div className="lightbox-prompt-title">
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <span>{lightbox.item.prompt}</span>
+                  {lightbox.item.enhancedPrompt && lightbox.item.enhancedPrompt !== lightbox.item.prompt && (
+                    <span className="ai-enhanced-pill">✨ Director Upgrade</span>
+                  )}
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const textToCopy = lightbox.item.enhancedPrompt || lightbox.item.prompt;
+                    if (navigator.clipboard) {
+                      navigator.clipboard.writeText(textToCopy);
+                    }
+                    if (showToast) showToast('Prompt copied to clipboard!');
+                  }}
+                  style={{
+                    background: 'rgba(255, 255, 255, 0.08)',
+                    border: '1px solid rgba(255, 255, 255, 0.15)',
+                    color: '#cbd5e1',
+                    borderRadius: 6,
+                    padding: '3px 8px',
+                    fontSize: '0.7rem',
+                    fontWeight: 700,
+                    cursor: 'pointer'
+                  }}
+                >
+                  Copy Prompt
+                </button>
+              </div>
+              {lightbox.item.enhancedPrompt && (
+                <p className="lightbox-prompt-body">
+                  {lightbox.item.enhancedPrompt}
+                </p>
+              )}
+            </div>
+          )}
 
           <button type="button" className="lightbox-close" onClick={closeLightbox} aria-label="Close">
             <X size={22} />
