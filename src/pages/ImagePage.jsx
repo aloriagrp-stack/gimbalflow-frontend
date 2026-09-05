@@ -82,8 +82,8 @@ export default function ImagePage({
 }) {
   const mode = 'image'; // image only
   const [prompt, setPrompt] = useState(preloadedSetup?.prompt || '');
-  const [modelOptions, setModelOptions] = useState(['Flux Realism']);
-  const [model, setModel] = useState(preloadedSetup?.model || 'Flux Realism');
+  const [modelOptions, setModelOptions] = useState(['Google Gemini (Imagen 3)']);
+  const [model, setModel] = useState(preloadedSetup?.model || 'Google Gemini (Imagen 3)');
   const [aspectRatio, setAspectRatio] = useState(preloadedSetup?.aspectRatio || '16:9');
   const [numImages, setNumImages] = useState(2);
   const [referenceImg, setReferenceImg] = useState(null);

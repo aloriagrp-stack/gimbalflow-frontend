@@ -180,7 +180,7 @@ export async function fetchProvidersStatusApi() {
   } catch (err) {
     console.warn('API fetchProvidersStatus fallback:', err.message);
   }
-  return { gemini_imagen: false, openai_dalle: false, active_models: ['Seedance v2', 'Flux Realism'] };
+  return { gemini_imagen: true, openai_dalle: false, active_models: ['Google Gemini (Imagen 3)'] };
 }
 
 export async function generateAiImageApi(params) {
