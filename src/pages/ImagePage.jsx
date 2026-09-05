@@ -82,11 +82,21 @@ export default function ImagePage({
 }) {
   const mode = 'image'; // image only
   const [prompt, setPrompt] = useState(preloadedSetup?.prompt || '');
-  const [model, setModel] = useState(preloadedSetup?.model || 'Google Imagen 3 (Ultra 8K)');
+  const [modelOptions, setModelOptions] = useState(['Flux Realism']);
+  const [model, setModel] = useState(preloadedSetup?.model || 'Flux Realism');
   const [aspectRatio, setAspectRatio] = useState(preloadedSetup?.aspectRatio || '16:9');
   const [numImages, setNumImages] = useState(2);
   const [referenceImg, setReferenceImg] = useState(null);
   const fileInputRef = useRef(null);
+
+  useEffect(() => {
+    fetchProvidersStatusApi().then((status) => {
+      if (status && Array.isArray(status.active_models) && status.active_models.length > 0) {
+        setModelOptions(status.active_models);
+        setModel((prev) => (status.active_models.includes(prev) ? prev : status.active_models[0]));
+      }
+    });
+  }, []);
 
   const handleFilePick = (e) => {
     const file = e.target.files?.[0];
@@ -219,19 +229,6 @@ export default function ImagePage({
     window.addEventListener('click', handler);
     return () => window.removeEventListener('click', handler);
   }, [activeCardMenu]);
-
-  // Model list based on mode (Top-Tier Global AI Engines)
-  const modelOptions = mode === 'image' 
-    ? [
-        'FLUX 1.1 Pro (Industry #1)',
-        'Google Imagen 3 (Ultra 8K)',
-        'OpenAI DALL-E 3 (Cinema HD)',
-        'Stable Diffusion 3.5 Large',
-        'Ideogram 2.0 (Design & Text)',
-        'Higgsfield Cinema Pro',
-        'Flux Realism'
-      ]
-    : ['Seedance 2.5 Cinema', 'Higgsfield Motion Pro', 'Sora Cinema'];
 
   const creditCost = 10;
 
