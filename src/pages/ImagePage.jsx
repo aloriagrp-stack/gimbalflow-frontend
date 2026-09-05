@@ -220,9 +220,17 @@ export default function ImagePage({
     return () => window.removeEventListener('click', handler);
   }, [activeCardMenu]);
 
-  // Model list based on mode
+  // Model list based on mode (Top-Tier Global AI Engines)
   const modelOptions = mode === 'image' 
-    ? ['Google Imagen 3 (Ultra 8K)', 'OpenAI DALL-E 3 (Cinema HD)', 'Higgsfield Cinema Pro', 'Seedance v2', 'Flux Realism']
+    ? [
+        'FLUX 1.1 Pro (Industry #1)',
+        'Google Imagen 3 (Ultra 8K)',
+        'OpenAI DALL-E 3 (Cinema HD)',
+        'Stable Diffusion 3.5 Large',
+        'Ideogram 2.0 (Design & Text)',
+        'Higgsfield Cinema Pro',
+        'Flux Realism'
+      ]
     : ['Seedance 2.5 Cinema', 'Higgsfield Motion Pro', 'Sora Cinema'];
 
   const creditCost = 10;
